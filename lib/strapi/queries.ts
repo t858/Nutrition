@@ -93,7 +93,18 @@ export function useSingleType<T = unknown>(
 ) {
   return useQuery({
     queryKey: strapiQueryKeys.singleType(contentType, params),
-    queryFn: () => strapiClient.fetchSingleType<T>(contentType, params),
+    queryFn: async () => {
+      try {
+        return await strapiClient.fetchSingleType<T>(contentType, params);
+      } catch (error: any) {
+        // If Strapi is not available, return empty data structure
+        if (error.message?.includes('Strapi not available') || error.name === 'AbortError') {
+          return { data: null as T, meta: undefined };
+        }
+        throw error;
+      }
+    },
+    retry: false, // Don't retry if Strapi is not available
     ...options,
   });
 }
@@ -113,7 +124,17 @@ export function useCollectionType<T = unknown>(
 ) {
   return useQuery({
     queryKey: strapiQueryKeys.collection(contentType, params),
-    queryFn: () => strapiClient.fetchCollectionType<T>(contentType, params),
+    queryFn: async () => {
+      try {
+        return await strapiClient.fetchCollectionType<T>(contentType, params);
+      } catch (error: any) {
+        if (error.message?.includes('Strapi not available') || error.name === 'AbortError') {
+          return { data: [] as T[], meta: undefined };
+        }
+        throw error;
+      }
+    },
+    retry: false,
     ...options,
   });
 }
@@ -134,8 +155,18 @@ export function useEntryById<T = unknown>(
 ) {
   return useQuery({
     queryKey: strapiQueryKeys.entry(contentType, id, params),
-    queryFn: () => strapiClient.fetchEntryById<T>(contentType, id, params),
+    queryFn: async () => {
+      try {
+        return await strapiClient.fetchEntryById<T>(contentType, id, params);
+      } catch (error: any) {
+        if (error.message?.includes('Strapi not available') || error.name === 'AbortError') {
+          return { data: null as T, meta: undefined };
+        }
+        throw error;
+      }
+    },
     enabled: !!id,
+    retry: false,
     ...options,
   });
 }

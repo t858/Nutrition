@@ -128,13 +128,18 @@ async function main() {
   );
 
   console.log("\n📝 Login credentials:");
-  console.log("Admin:");
-  console.log("  Email: admin@nutriwell.com");
-  console.log("  Password: password123");
-  console.log("\nPatient:");
-  console.log("  Email: patient@nutriwell.com");
-  console.log("  Password: password123");
-  console.log("\n✨ Seed completed!");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("👤 Admin User:");
+  console.log("   Email:    admin@nutriwell.com");
+  console.log("   Password: password123");
+  console.log("   Role:     admin");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("👤 Patient User:");
+  console.log("   Email:    patient@nutriwell.com");
+  console.log("   Password: password123");
+  console.log("   Role:     patient");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("\n✨ Seed completed! You can now use these credentials to log in.");
 }
 
 main()

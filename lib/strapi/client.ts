@@ -159,6 +159,7 @@ function buildQueryString(params: StrapiQueryParams): string {
 
 /**
  * Makes a request to the Strapi API
+ * Handles connection errors gracefully (Strapi is optional)
  */
 async function strapiRequest<T>(
   endpoint: string,
@@ -171,30 +172,49 @@ async function strapiRequest<T>(
     ...options.headers,
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  try {
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-  if (!response.ok) {
-    const error: StrapiError = await response.json().catch(() => ({
-      error: {
-        status: response.status,
-        name: "FetchError",
-        message: response.statusText,
-      },
-    }));
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
 
-    throw new Error(
-      `Strapi API Error: ${error.error.message || response.statusText} (${
-        error.error.status
-      })`
-    );
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const error: StrapiError = await response.json().catch(() => ({
+        error: {
+          status: response.status,
+          name: "FetchError",
+          message: response.statusText,
+        },
+      }));
+
+      throw new Error(
+        `Strapi API Error: ${error.error.message || response.statusText} (${
+          error.error.status
+        })`
+      );
+    }
+
+    return response.json();
+  } catch (error: any) {
+    // Handle connection errors gracefully (Strapi is optional)
+    if (error.name === 'AbortError' || error.message?.includes('fetch') || error.message?.includes('ECONNREFUSED')) {
+      console.warn(`⚠️ Strapi not available at ${STRAPI_URL}. This is optional - continuing without CMS data.`);
+      // Return empty response structure so the app doesn't crash
+      return {
+        data: null as T,
+        meta: undefined,
+      };
+    }
+    // Re-throw other errors
+    throw error;
   }
-
-  console.log(response);
-
-  return response.json();
 }
 
 /**

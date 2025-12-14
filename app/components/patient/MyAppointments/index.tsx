@@ -6,12 +6,22 @@ import type { Appointment } from "@/@types/app.types";
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    completed: "bg-blue-100 text-blue-700",
-    pending: "bg-yellow-100 text-yellow-700",
-    confirmed: "bg-green-100 text-green-700",
-    cancelled: "bg-red-100 text-red-700",
+    completed: "bg-blue-100 text-blue-800",
+    pending: "bg-yellow-100 text-yellow-800",
+    confirmed: "bg-green-100 text-green-800",
+    cancelled: "bg-red-100 text-red-800",
   };
   return colors[status] || colors.pending;
+};
+
+const getAppointmentTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    consultation: "Consultation",
+    follow_up: "Follow-up",
+    nutrition_plan: "Nutrition Plan",
+    weight_management: "Weight Management",
+  };
+  return labels[type] || type;
 };
 
 export default function MyAppointments({
@@ -49,13 +59,13 @@ export default function MyAppointments({
                     {appointment.status}
                   </span>
                   <span className="text-sm text-gray-600">
-                    {appointment.type || "Consultation"}
+                    {getAppointmentTypeLabel(appointment.type || "consultation")}
                   </span>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-emerald-600 mt-2">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span>{appointment.appointment_date}</span>
+                    <span>{new Date(appointment.appointment_date).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />

@@ -16,7 +16,7 @@ import { translations } from "@/translations/Translations";
 import { signIn, signUp, useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import type { LoginModalProps } from "./@types";
-import type { SessionWithRole } from "@/lib/auth";
+// Removed SessionWithRole import since we simplified auth
 
 // Zod schema for signup validation
 const signupSchema = z
@@ -61,14 +61,14 @@ export default function LoginModal({
   // Helper function to get role-specific dashboard URL
   const getDashboardUrl = (userRole?: string) => {
     const role =
-      userRole || (session as SessionWithRole | null)?.user?.role || "patient";
+      userRole || "patient";
     return `/dashboard/${role}`;
   };
 
   // Watch for session changes after login to redirect
   useEffect(() => {
     if (shouldRedirect && session?.user) {
-      const role = (session as SessionWithRole | null)?.user?.role || "patient";
+      const role = "patient";
       const dashboardUrl = `/dashboard/${role}`;
       setShouldRedirect(false);
       window.location.href = dashboardUrl;

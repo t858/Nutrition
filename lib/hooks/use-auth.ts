@@ -2,17 +2,23 @@
 
 import { useSession } from "@/lib/auth-client";
 import type { Role } from "@/@types/app.types";
-import type { SessionWithRole } from "@/lib/auth";
 
 export function useAuth() {
   const { data: session, isPending } = useSession();
 
-  // Type assertion to include the role field added by customSession
-  const typedSession = session as SessionWithRole | null;
-  const user = typedSession?.user;
+  const user = session?.user;
   const isAuthenticated = !!user;
-  // The role is included in the session via customSession plugin in auth.ts
-  const role: Role = user?.role || "patient";
+
+  // Determine role based on email for default users
+  let role: Role = "patient";
+  if (user?.email) {
+    if (user.email === "admin@nutriwell.com") {
+      role = "admin";
+    } else if (user.email === "patient@nutriwell.com") {
+      role = "patient";
+    }
+    // For other users, you could fetch from database here
+  }
 
   const hasRole = (requiredRole: Role | Role[]) => {
     if (!isAuthenticated) return false;

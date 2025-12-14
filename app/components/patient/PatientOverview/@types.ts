@@ -7,5 +7,8 @@ export interface TPatientSummaryCard {
   value: string | number;
   subtitle: string;
   icon: React.ComponentType<{ className?: string }>;
+  statusColor?: string;
+  clickable?: boolean;
+  onClick?: () => void;
 }
 
